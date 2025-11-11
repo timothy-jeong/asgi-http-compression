@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asgi-http-compression"
+version = "0.1.0"
+description = "ASGI middleware for http response compression"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "timothy jeong", email = "k.jts8257@gmail.com" },
+]
+python_requires = ">=3.10"
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: ASGI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Middleware",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+keywords = ["asgi", "middleware", "compression", "gzip", "brotli", "zstd", "fastapi", "starlette"]
+
+[project.urls]
+Homepage = "https://github.com/timothy-jeong/asgi-http-compression"
+Repository = "https://github.com/timothy-jeong/asgi-http-compression"
+
+[project.optional-dependencies]
+brotli = ["brotli"]
+zstd = ["zstd"]
+
+dev = [
+    "asgi-http-compression[brotli,zstd]",
+    "ruff",
+    "pytest",
+    "pytest-cov",
+    "httpx",
+    "starlette",
+    "anyio",
+]
+
+[tool.setuptools]
+package_dir = { "" = "src" }
+packages = { find = {} }
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["asgi_http_compression"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-v --cov=src/asgi_http_compression --cov-report=term-missing"
+asyncio_mode = "auto"
