@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "asgi-http-compression"
@@ -11,11 +11,10 @@ license = { text = "MIT" }
 authors = [
     { name = "timothy jeong", email = "k.jts8257@gmail.com" },
 ]
-python_requires = ">=3.10"
+requires-python = ">=3.10"
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Framework :: ASGI",
+    "Framework :: FastAPI",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -24,10 +23,9 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Internet :: WWW/HTTP :: Middleware",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-
 keywords = ["asgi", "middleware", "compression", "gzip", "brotli", "zstd", "fastapi", "starlette"]
 
 [project.urls]
@@ -39,7 +37,7 @@ brotli = ["brotli"]
 zstd = ["zstd"]
 
 dev = [
-    "asgi-http-compression[brotli,zstd]",
+    "asgi-http-compression",
     "ruff",
     "pytest",
     "pytest-cov",
@@ -47,10 +45,6 @@ dev = [
     "starlette",
     "anyio",
 ]
-
-[tool.setuptools]
-package_dir = { "" = "src" }
-packages = { find = {} }
 
 [tool.ruff]
 line-length = 88
@@ -67,3 +61,6 @@ minversion = "7.0"
 testpaths = ["tests"]
 addopts = "-v --cov=src/asgi_http_compression --cov-report=term-missing"
 asyncio_mode = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/asgi_http_compression"]
