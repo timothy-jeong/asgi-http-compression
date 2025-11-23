@@ -178,8 +178,14 @@ class CompressionResponder:
 
         # 2. Update Headers
         self.headers["Content-Encoding"] = self.encoding
-        self.headers.add_vary("Accept-Encoding")
         self.headers["Content-Length"] = str(len(compressed_body))
+
+        vary = self.headers.get("vary")
+        if vary:
+            if "accept-encoding" not in vary.lower():
+                self.headers["vary"] = f"{vary}, Accept-Encoding"
+        else:
+            self.headers["vary"] = "Accept-Encoding"
 
         # 3. Send Start
         await self.original_send({
@@ -198,7 +204,7 @@ class CompressionResponder:
 
     async def start_streaming_compression(self, body: bytes) -> None:
         """
-        Starts streaming compression. Removes Content-Length to trigger chunked encoding.
+        Starts streaming compression. Removes Content-Length to trigger chunked encoding
         """
         if self.headers is None:
             raise RuntimeError("Headers not set")
@@ -207,7 +213,12 @@ class CompressionResponder:
 
         # Update Headers
         self.headers["Content-Encoding"] = self.encoding
-        self.headers.add_vary("Accept-Encoding")
+        vary = self.headers.get("vary")
+        if vary:
+            if "accept-encoding" not in vary.lower():
+                self.headers["vary"] = f"{vary}, Accept-Encoding"
+        else:
+            self.headers["vary"] = "Accept-Encoding"
 
         # Remove Content-Length because we don't know the final size yet
         if "content-length" in self.headers:
@@ -223,7 +234,10 @@ class CompressionResponder:
         self.started = True
 
         # Compress and send the first chunk
-        await self.compress_and_send({"type": "http.response.body", "body": body, "more_body": True})
+        await self.compress_and_send({
+            "type": "http.response.body",
+            "body": body, "more_body": True,
+        })
 
     async def send_uncompressed(self, body: bytes) -> None:
         if self.headers is None:
@@ -235,7 +249,10 @@ class CompressionResponder:
             "headers": self.headers.raw,
         })
         self.started = True
-        await self.original_send({"type": "http.response.body", "body": body, "more_body": False,})
+        await self.original_send({
+            "type": "http.response.body",
+            "body": body, "more_body": False,
+        })
 
     async def compress_and_send(self, message: Message) -> None:
         body = message.get("body", b"")

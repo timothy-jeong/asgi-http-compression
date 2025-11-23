@@ -22,7 +22,7 @@ class BaseCompressor(ABC):
     def __init__(self, level: int = 6, **kwargs: Any) -> None:
         """
         Common initializer.
-        
+
         :param level: Compression level (1-9 for zlib).
         :param kwargs: Extra arguments (e.g., 'threads') for future compatibility.
                        Currently ignored by Gzip/Deflate.
@@ -50,7 +50,7 @@ class GzipCompressor(BaseCompressor):
     def __init__(self, level: int = 6, **kwargs: Any) -> None:
         super().__init__(level, **kwargs)
         # wbits=31 (16+15): zlib generates gzip header & trailer
-        self.compressor = zlib.compressobj(level, zlib.DEFLATE, 31)
+        self.compressor = zlib.compressobj(level, zlib.DEFLATED, 31)
 
     def compress(self, data: bytes) -> bytes:
         return self.compressor.compress(data)
@@ -68,7 +68,7 @@ class DeflateCompressor(BaseCompressor):
     def __init__(self, level: int = 6, **kwargs: Any) -> None:
         super().__init__(level, **kwargs)
         # wbits=-15: raw deflate (no headers)
-        self.compressor = zlib.compressobj(level, zlib.DEFLATE, -15)
+        self.compressor = zlib.compressobj(level, zlib.DEFLATED, -15)
 
     def compress(self, data: bytes) -> bytes:
         return self.compressor.compress(data)
