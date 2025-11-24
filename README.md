@@ -82,6 +82,13 @@ app.add_middleware(
 )
 ```
 
+
+## How to Test
+
+```bash
+uv run --extra test pytest  
+```
+
 ## Tanks to
 This project is inspired by and builds upon the ideas from:
 - [asgi-zstd](https://github.com/tuffnatty/zstd-asgi)
