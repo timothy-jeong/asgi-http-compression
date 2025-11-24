@@ -1,4 +1,5 @@
 import pprint
+
 import pytest
 
 from asgi_http_compression.compressors import GzipCompressor
@@ -26,7 +27,9 @@ async def mock_app(scope, receive, send):
             "headers": [(b"content-type", b"text/plain")],
         }
     )
-    await send({"type": "http.response.body", "body": b"Hello, World!", "more_body": False})
+    await send(
+        {"type": "http.response.body", "body": b"Hello, World!", "more_body": False}
+    )
 
 
 @pytest.mark.asyncio
@@ -51,7 +54,7 @@ async def test_responder_compresses_response(compressor):
     assert b"content-length" in headers
 
     assert body_message["type"] == "http.response.body"
-    assert body_message["body"] != b"Hello, World!" 
+    assert body_message["body"] != b"Hello, World!"
     assert not body_message["more_body"]
 
     print("\n--- Captured messages for test_responder_compresses_response ---")
@@ -61,7 +64,9 @@ async def test_responder_compresses_response(compressor):
 
 @pytest.mark.asyncio
 async def test_responder_skips_small_response(compressor):
-    """Test that the responder does not compress a response smaller than minimum_size."""
+    """
+    Test that the responder does not compress a response smaller than minimum_size.
+    """
     send = MockSend()
     responder = CompressionResponder(
         app=mock_app,
@@ -79,7 +84,7 @@ async def test_responder_skips_small_response(compressor):
     assert b"content-encoding" not in headers
     assert b"vary" not in headers
 
-    assert body_message["body"] == b"Hello, World!" 
+    assert body_message["body"] == b"Hello, World!"
 
 
 async def streaming_app(scope, receive, send):
@@ -147,5 +152,5 @@ async def test_responder_respects_existing_content_encoding(compressor):
     start_message, _ = send.messages
 
     headers = dict(start_message["headers"])
-    assert headers[b"content-encoding"] == b"identity" 
+    assert headers[b"content-encoding"] == b"identity"
     assert b"vary" not in headers
