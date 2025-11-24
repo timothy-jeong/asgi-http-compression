@@ -4,25 +4,20 @@ from typing import Protocol
 
 
 class Compressor(Protocol):
-
     def compress(self, data: bytes) -> bytes: ...
 
     def flush(self) -> bytes: ...
 
 
 class BaseCompressor(ABC):
+    @abstractmethod
+    def compress(self, data: bytes) -> bytes: ...
 
     @abstractmethod
-    def compress(self, data: bytes) -> bytes:
-       ...
-
-    @abstractmethod
-    def flush(self) -> bytes:
-        ...
+    def flush(self) -> bytes: ...
 
 
 class GzipCompressor(BaseCompressor):
-
     def __init__(self, level: int = 9) -> None:
         self._compressobj = zlib.compressobj(level=level, wbits=15 + 16)
 
@@ -34,8 +29,6 @@ class GzipCompressor(BaseCompressor):
 
 
 class DeflateCompressor(BaseCompressor):
- 
-
     def __init__(self, level: int = 6) -> None:
         self._compressobj = zlib.compressobj(level=level)
 

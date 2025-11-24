@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "asgi-http-compression"
-version = "0.1.0"
+version = "0.2.0"
 description = "ASGI middleware for http response compression"
 readme = "README.md"
 license = { text = "MIT" }
@@ -28,9 +28,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 keywords = ["asgi", "middleware", "compression", "gzip", "brotli", "zstd", "zstandard", "fastapi", "starlette"]
-dependencies = [
-    "starlette>=0.48.0",
-]
+dependencies = []
 
 [project.urls]
 Homepage = "https://github.com/timothy-jeong/asgi-http-compression"

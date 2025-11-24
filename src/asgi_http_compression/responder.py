@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-
 from asgi_http_compression.compressors import Compressor
-from asgi_http_compression.types import ASGIApp, Message, Receive, Send, Scope
-
+from asgi_http_compression.types import ASGIApp, Message, Receive, Scope, Send
 
 
 class CompressionResponder:
-
     def __init__(
         self,
         app: ASGIApp,

@@ -83,8 +83,14 @@ app.add_middleware(
 ```
 
 
-## How to Test
+## Contributing
+### How to Check lint
+```bash
+uv run --extra lint ruff check .
+uv run ruff format .
+```
 
+### How to Test
 ```bash
 uv run --extra test pytest  
 ```
