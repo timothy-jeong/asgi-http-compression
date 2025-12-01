@@ -16,7 +16,7 @@ This middleware provides high-performance compression for ASGI applications (Sta
     * **`level`**: Fine-tune the compression level for each algorithm (e.g., `gzip_level`, `brotli_level`, `zstd_level`).
 * **Advanced Dictionary Compression:**
     * Supports pre-trained **static dictionaries** for `brotli` and `zstd`. This is perfect for dramatically improving compression ratios on known data structures (like common JSON responses).
-    * Includes planned support for the emerging [**experimental HTTP Compression Dictionaries**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Compression_dictionaries) standard, allowing browsers to opt-in to using a dictionary.
+    * Includes planned support for the emerging [**experimental HTTP Compression Dictionaries**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Compression_dictionary_transport) standard, allowing browsers to opt-in to using a dictionary.
 
 ## Installation
 
