@@ -3,7 +3,12 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from asgi_http_compression.compressors import DeflateCompressor, GzipCompressor
+from asgi_http_compression.compressors import (
+    DeflateCompressor,
+    GzipCompressor,
+    BrotliCompressor,
+    BROTLI_AVAILABLE,
+)
 from asgi_http_compression.responder import CompressionResponder
 from asgi_http_compression.types import ASGIApp, Receive, Scope, Send
 
@@ -15,6 +20,7 @@ class CompressionMiddleware:
         minimum_size: int = 500,
         gzip_level: int = 9,
         deflate_level: int = 6,
+        brotli_level: int = 4,
     ) -> None:
         self.app = app
         self.minimum_size = minimum_size
@@ -23,6 +29,13 @@ class CompressionMiddleware:
         # (creation functions)
         # NOTE: The order is important: list the ones the server prefers first
         self.compressor_factories: dict[str, Callable[[], Any]] = {}
+
+        # Brotli를 가장 먼저 등록 (우선순위 높음)
+        # BROTLI_AVAILABLE 플래그로 실제 brotli 패키지 설치 여부 확인
+        if BROTLI_AVAILABLE:
+            self.compressor_factories["br"] = lambda: BrotliCompressor(
+                level=brotli_level
+            )
 
         self.compressor_factories["gzip"] = lambda: GzipCompressor(level=gzip_level)
 
