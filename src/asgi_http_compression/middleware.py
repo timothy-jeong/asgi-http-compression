@@ -7,7 +7,9 @@ from asgi_http_compression.compressors import (
     DeflateCompressor,
     GzipCompressor,
     BrotliCompressor,
+    ZstdCompressor,
     BROTLI_AVAILABLE,
+    ZSTD_AVAILABLE,
 )
 from asgi_http_compression.responder import CompressionResponder
 from asgi_http_compression.types import ASGIApp, Receive, Scope, Send
@@ -21,6 +23,7 @@ class CompressionMiddleware:
         gzip_level: int = 9,
         deflate_level: int = 6,
         brotli_level: int = 4,
+        zstd_level: int = 3,
     ) -> None:
         self.app = app
         self.minimum_size = minimum_size
@@ -29,6 +32,9 @@ class CompressionMiddleware:
         # (creation functions)
         # NOTE: The order is important: list the ones the server prefers first
         self.compressor_factories: dict[str, Callable[[], Any]] = {}
+
+        if ZSTD_AVAILABLE:
+            self.compressor_factories["zstd"] = lambda: ZstdCompressor(level=zstd_level)
 
         if BROTLI_AVAILABLE:
             self.compressor_factories["br"] = lambda: BrotliCompressor(
