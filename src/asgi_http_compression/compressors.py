@@ -79,7 +79,7 @@ class ZstdCompressor(BaseCompressor):
             raise ImportError(
                 "zstandard extra is required. Install with: pip install 'asgi-http-compression[zstd]'"
             )
-        
+
         if level not in self._compressors_cache:
             self._compressors_cache[level] = zstandard.ZstdCompressor(
                 level=level, write_content_size=False

@@ -127,20 +127,17 @@ def test_brotli_incremental_compression():
 
 @pytest.mark.skipif(not ZSTD_AVAILABLE, reason="zstandard package not installed")
 def test_zstd_compressor_caching():
-
     comp1 = ZstdCompressor(level=3)
     comp2 = ZstdCompressor(level=3)
     comp3 = ZstdCompressor(level=1)
 
-
     assert 3 in ZstdCompressor._compressors_cache
     assert 1 in ZstdCompressor._compressors_cache
-    
 
     assert ZstdCompressor._compressors_cache[3] is ZstdCompressor._compressors_cache[3]
-    
 
-    assert ZstdCompressor._compressors_cache[3] is not ZstdCompressor._compressors_cache[1]
-    
+    assert (
+        ZstdCompressor._compressors_cache[3] is not ZstdCompressor._compressors_cache[1]
+    )
 
     assert comp1._compressor is not comp2._compressor

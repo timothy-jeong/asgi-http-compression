@@ -17,7 +17,6 @@ except ImportError:
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_middleware_brotli_integration():
-
     async def hello_handler(request):
         return JSONResponse({"message": "Hello, World! " * 100})
 
@@ -39,7 +38,6 @@ async def test_middleware_brotli_integration():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_middleware_brotli_streaming():
-
     async def stream_handler(request):
         async def gen():
             for i in range(5):
@@ -66,7 +64,6 @@ async def test_middleware_brotli_streaming():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_middleware_brotli_priority():
-
     async def hello_handler(request):
         return JSONResponse({"message": "Hello, World! " * 100})
 
@@ -107,7 +104,6 @@ async def test_middleware_brotli_not_supported_client():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_middleware_brotli_minimum_size():
-
     async def small_handler(request):
         return JSONResponse({"message": "small"})
 
