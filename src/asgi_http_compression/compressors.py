@@ -10,7 +10,10 @@ except ImportError:
 try:
     import zstandard
 except ImportError:
-    zstandard = None
+    try:
+        from compression.zstd import ZstdCompressor, CompressionParameter
+    except ImportError:
+        zstandard = None
 
 BROTLI_AVAILABLE = brotli is not None
 ZSTD_AVAILABLE = zstandard is not None

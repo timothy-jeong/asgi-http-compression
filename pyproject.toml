@@ -37,7 +37,7 @@ Repository = "https://github.com/timothy-jeong/asgi-http-compression"
 
 [project.optional-dependencies]
 brotli = ["brotli>=1.2.0"]
-zstd = ["zstandard"]
+zstd = ["zstandard>=0.25.0"]
 
 test = [
     "anyio>=4.11.0",
