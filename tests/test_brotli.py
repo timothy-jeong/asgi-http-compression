@@ -10,7 +10,6 @@ except ImportError:
 
 from asgi_http_compression.responder import CompressionResponder
 
-# test_responder.py의 MockSend, mock_app, streaming_app 등을 재사용
 from test_responder import (
     MockSend,
     app_with_encoding,
@@ -22,7 +21,6 @@ from test_responder import (
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_brotli_basic_compression():
-    """기본 Brotli 압축 테스트"""
     compressor = BrotliCompressor(level=4)
     send = MockSend()
     responder = CompressionResponder(
@@ -42,7 +40,6 @@ async def test_brotli_basic_compression():
     assert headers[b"vary"] == b"Accept-Encoding"
     assert b"content-length" in headers
 
-    # 압축 해제 확인
     compressed_body = body_message["body"]
     decompressed = brotli.decompress(compressed_body)
     assert decompressed == b"Hello, World!"
@@ -51,7 +48,6 @@ async def test_brotli_basic_compression():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_brotli_streaming_response():
-    """StreamingResponse 테스트"""
     compressor = BrotliCompressor(level=4)
     send = MockSend()
     responder = CompressionResponder(
@@ -73,7 +69,6 @@ async def test_brotli_streaming_response():
     assert body1["more_body"]
     assert body2["more_body"] is False
 
-    # 전체 압축 데이터 수집 및 압축 해제
     full_compressed = body1["body"] + body2["body"]
     decompressed = brotli.decompress(full_compressed)
     assert decompressed == b"Streaming part 2"
@@ -82,7 +77,6 @@ async def test_brotli_streaming_response():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_brotli_respects_existing_content_encoding():
-    """이미 Content-Encoding이 있는 응답 처리"""
     compressor = BrotliCompressor(level=4)
     send = MockSend()
     responder = CompressionResponder(
@@ -98,14 +92,13 @@ async def test_brotli_respects_existing_content_encoding():
     start_message, _ = send.messages
 
     headers = dict(start_message["headers"])
-    assert headers[b"content-encoding"] == b"identity"  # 기존 인코딩 유지
+    assert headers[b"content-encoding"] == b"identity"
     assert b"vary" not in headers
 
 
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_brotli_skips_small_response():
-    """minimum_size 조건 테스트"""
     compressor = BrotliCompressor(level=4)
     send = MockSend()
     responder = CompressionResponder(
@@ -130,10 +123,8 @@ async def test_brotli_skips_small_response():
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
 @pytest.mark.asyncio
 async def test_brotli_incremental_compression():
-    """여러 chunk로 나뉜 응답의 incremental 압축 테스트"""
     compressor = BrotliCompressor(level=4)
 
-    # 여러 chunk로 나눠서 압축
     chunk1 = b"First chunk of data. "
     chunk2 = b"Second chunk of data. "
     chunk3 = b"Third chunk of data."

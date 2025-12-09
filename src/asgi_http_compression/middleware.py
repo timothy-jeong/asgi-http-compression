@@ -30,8 +30,6 @@ class CompressionMiddleware:
         # NOTE: The order is important: list the ones the server prefers first
         self.compressor_factories: dict[str, Callable[[], Any]] = {}
 
-        # Brotli를 가장 먼저 등록 (우선순위 높음)
-        # BROTLI_AVAILABLE 플래그로 실제 brotli 패키지 설치 여부 확인
         if BROTLI_AVAILABLE:
             self.compressor_factories["br"] = lambda: BrotliCompressor(
                 level=brotli_level

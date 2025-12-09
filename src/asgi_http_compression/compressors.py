@@ -55,9 +55,7 @@ class BrotliCompressor(BaseCompressor):
         self._compressor = brotli.Compressor(quality=level)
 
     def compress(self, data: bytes) -> bytes:
-        """스트리밍 압축을 위한 incremental compress"""
         return self._compressor.process(data)
 
     def flush(self) -> bytes:
-        """압축 완료 및 남은 데이터 반환"""
         return self._compressor.finish()
