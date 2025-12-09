@@ -1,7 +1,9 @@
 import pytest
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
 from httpx import ASGITransport, AsyncClient
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.responses import JSONResponse, StreamingResponse
+from starlette.routing import Route
 
 try:
     import brotli  # type: ignore[import-untyped]
@@ -16,12 +18,14 @@ except ImportError:
 @pytest.mark.asyncio
 async def test_middleware_brotli_integration():
     """미들웨어와 실제 ASGI 앱을 함께 테스트"""
-    app = FastAPI()
-    app.add_middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)
 
-    @app.get("/hello")
-    async def hello():
-        return {"message": "Hello, World! " * 100}
+    async def hello_handler(request):
+        return JSONResponse({"message": "Hello, World! " * 100})
+
+    app = Starlette(
+        routes=[Route("/hello", hello_handler, methods=["GET"])],
+        middleware=[Middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)],
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
@@ -37,16 +41,18 @@ async def test_middleware_brotli_integration():
 @pytest.mark.asyncio
 async def test_middleware_brotli_streaming():
     """미들웨어와 StreamingResponse 테스트"""
-    app = FastAPI()
-    app.add_middleware(CompressionMiddleware, minimum_size=1, brotli_level=4)
 
-    @app.get("/stream")
-    async def stream():
+    async def stream_handler(request):
         async def gen():
             for i in range(5):
                 yield f"chunk-{i},".encode()
 
         return StreamingResponse(gen(), media_type="text/plain")
+
+    app = Starlette(
+        routes=[Route("/stream", stream_handler, methods=["GET"])],
+        middleware=[Middleware(CompressionMiddleware, minimum_size=1, brotli_level=4)],
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
@@ -63,12 +69,14 @@ async def test_middleware_brotli_streaming():
 @pytest.mark.asyncio
 async def test_middleware_brotli_priority():
     """우선순위 테스트: br이 gzip보다 우선 선택되는지 확인"""
-    app = FastAPI()
-    app.add_middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)
 
-    @app.get("/hello")
-    async def hello():
-        return {"message": "Hello, World! " * 100}
+    async def hello_handler(request):
+        return JSONResponse({"message": "Hello, World! " * 100})
+
+    app = Starlette(
+        routes=[Route("/hello", hello_handler, methods=["GET"])],
+        middleware=[Middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)],
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
@@ -86,12 +94,14 @@ async def test_middleware_brotli_priority():
 @pytest.mark.asyncio
 async def test_middleware_brotli_not_supported_client():
     """Brotli를 지원하지 않는 클라이언트는 gzip 사용"""
-    app = FastAPI()
-    app.add_middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)
 
-    @app.get("/hello")
-    async def hello():
-        return {"message": "Hello, World! " * 100}
+    async def hello_handler(request):
+        return JSONResponse({"message": "Hello, World! " * 100})
+
+    app = Starlette(
+        routes=[Route("/hello", hello_handler, methods=["GET"])],
+        middleware=[Middleware(CompressionMiddleware, minimum_size=10, brotli_level=4)],
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
@@ -106,12 +116,16 @@ async def test_middleware_brotli_not_supported_client():
 @pytest.mark.asyncio
 async def test_middleware_brotli_minimum_size():
     """minimum_size 조건 테스트"""
-    app = FastAPI()
-    app.add_middleware(CompressionMiddleware, minimum_size=1000, brotli_level=4)
 
-    @app.get("/small")
-    async def small():
-        return {"message": "small"}
+    async def small_handler(request):
+        return JSONResponse({"message": "small"})
+
+    app = Starlette(
+        routes=[Route("/small", small_handler, methods=["GET"])],
+        middleware=[
+            Middleware(CompressionMiddleware, minimum_size=1000, brotli_level=4)
+        ],
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
