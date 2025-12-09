@@ -28,14 +28,15 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 keywords = ["asgi", "middleware", "compression", "gzip", "brotli", "zstd", "zstandard", "fastapi", "starlette"]
-dependencies = []
+dependencies = [
+]
 
 [project.urls]
 Homepage = "https://github.com/timothy-jeong/asgi-http-compression"
 Repository = "https://github.com/timothy-jeong/asgi-http-compression"
 
 [project.optional-dependencies]
-brotli = ["brotli"]
+brotli = ["brotli>=1.2.0"]
 zstd = ["zstandard"]
 
 test = [
@@ -44,6 +45,7 @@ test = [
     "pytest>=9.0.1",
     "pytest-cov>=7.0.0",
     "pytest-asyncio>=1.3.0",
+    "starlette>=0.50.0",
 ]
 lint = [
     "ruff>=0.14.6",
