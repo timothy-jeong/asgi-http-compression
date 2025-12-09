@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 from collections.abc import Callable
 from typing import Any
 
@@ -13,6 +14,72 @@ from asgi_http_compression.compressors import (
 )
 from asgi_http_compression.responder import CompressionResponder
 from asgi_http_compression.types import ASGIApp, Receive, Scope, Send
+
+
+@functools.lru_cache(maxsize=1024)
+def parse_and_select_encoding(
+    accept_header: str, available_encodings: tuple[str, ...]
+) -> str | None:
+    """
+    Parses Accept-Encoding header and returns the best match.
+    Cached to minimize parsing overhead on repetitive headers.
+
+    available_encodings: sorted by server priority
+    """
+    if not accept_header:
+        return None
+
+    # Fast Path: no q-value
+    if ";" not in accept_header:
+        candidates = set(part.strip().lower() for part in accept_header.split(","))
+        for encoding in available_encodings:
+            if encoding in candidates:
+                return encoding
+        return None
+
+    # Slow Path: parse q-value
+    client_preferences: dict[str, float] = {}
+
+    for part in accept_header.split(","):
+        if not part:
+            continue
+
+        pieces = part.split(";", 1)
+        encoding = pieces[0].strip().lower()
+
+        q_value = 1.0
+        if len(pieces) > 1:
+            param = pieces[1].strip()
+            if param.startswith("q="):
+                try:
+                    q_value = float(param[2:])
+                except ValueError:
+                    pass
+
+        client_preferences[encoding] = q_value
+
+    # match
+    best_encoding = None
+    best_q = -1.0
+
+    for encoding in available_encodings:
+        q = client_preferences.get(encoding)
+
+        # wildcard
+        if q is None and "*" in client_preferences:
+            q = client_preferences["*"]
+
+        if q is not None and q > best_q:
+            best_q = q
+            best_encoding = encoding
+            # Early Exit
+            if best_q >= 1.0:
+                return best_encoding
+
+    if best_q > 0:
+        return best_encoding
+
+    return None
 
 
 class CompressionMiddleware:
@@ -42,10 +109,12 @@ class CompressionMiddleware:
             )
 
         self.compressor_factories["gzip"] = lambda: GzipCompressor(level=gzip_level)
-
         self.compressor_factories["deflate"] = lambda: DeflateCompressor(
             level=deflate_level
         )
+
+        # tuple for cache
+        self.available_encodings = tuple(self.compressor_factories.keys())
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
@@ -62,7 +131,10 @@ class CompressionMiddleware:
                     return
                 break
 
-        selected_encoding = self._select_encoding(accept_encoding)
+        selected_encoding = parse_and_select_encoding(
+            accept_encoding,
+            self.available_encodings,
+        )
 
         if not selected_encoding:
             await self.app(scope, receive, send)
@@ -79,18 +151,3 @@ class CompressionMiddleware:
         )
 
         await responder(scope, receive, send)
-
-    def _select_encoding(self, accept_header: str) -> str | None:
-        if not accept_header:
-            return None
-
-        # TODO: In the future, parse q-values and select encoding according to priority
-        client_encodings = {
-            part.split(";")[0].strip().lower() for part in accept_header.split(",")
-        }
-
-        for encoding in self.compressor_factories:
-            if encoding in client_encodings:
-                return encoding
-
-        return None
