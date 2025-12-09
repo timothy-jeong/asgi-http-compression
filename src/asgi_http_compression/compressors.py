@@ -7,7 +7,16 @@ try:
 except ImportError:
     brotli = None
 
+try:
+    import zstandard
+except ImportError:
+    try:
+        from compression.zstd import ZstdCompressor, CompressionParameter
+    except ImportError:
+        zstandard = None
+
 BROTLI_AVAILABLE = brotli is not None
+ZSTD_AVAILABLE = zstandard is not None
 
 
 class Compressor(Protocol):
@@ -59,3 +68,27 @@ class BrotliCompressor(BaseCompressor):
 
     def flush(self) -> bytes:
         return self._compressor.finish()
+
+
+class ZstdCompressor(BaseCompressor):
+    # Class-level cache for ZstdCompressor configuration objects
+    _compressors_cache: dict[int, "zstandard.ZstdCompressor"] = {}
+
+    def __init__(self, level: int = 3) -> None:
+        if zstandard is None:
+            raise ImportError(
+                "zstandard extra is required. Install with: pip install 'asgi-http-compression[zstd]'"
+            )
+        
+        if level not in self._compressors_cache:
+            self._compressors_cache[level] = zstandard.ZstdCompressor(
+                level=level, write_content_size=False
+            )
+
+        self._compressor = self._compressors_cache[level].compressobj()
+
+    def compress(self, data: bytes) -> bytes:
+        return self._compressor.compress(data)
+
+    def flush(self) -> bytes:
+        return self._compressor.flush()
