@@ -40,6 +40,7 @@ brotli = ["brotli>=1.2.0"]
 zstd = ["zstandard>=0.25.0"]
 
 test = [
+    "tox>=4.0.0",
     "anyio>=4.11.0",
     "httpx>=0.28.1",
     "pytest>=9.0.1",
