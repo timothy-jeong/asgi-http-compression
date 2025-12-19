@@ -88,3 +88,25 @@ pythonpath = ["src"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/asgi_http_compression"]
 
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310, py311, py312, py313, py314, lint
+requires = tox-uv>=1.11.3
+
+[testenv]
+extras =
+    test
+    brotli
+    zstd
+commands =
+    pytest {posargs}
+
+[testenv:lint]
+description = Run linting checks
+extras = lint
+commands =
+    ruff check .
+    ruff format --check .
+"""
