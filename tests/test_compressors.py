@@ -6,6 +6,7 @@ from asgi_http_compression.compressors import DeflateCompressor, GzipCompressor
 
 try:
     import brotli  # type: ignore[import-untyped]
+
     from asgi_http_compression.compressors import BrotliCompressor
 
     BROTLI_AVAILABLE = True
@@ -14,6 +15,7 @@ except ImportError:
 
 try:
     import zstandard
+
     from asgi_http_compression.compressors import ZstdCompressor
 
     ZSTD_AVAILABLE = True
@@ -129,7 +131,7 @@ def test_brotli_incremental_compression():
 def test_zstd_compressor_caching():
     comp1 = ZstdCompressor(level=3)
     comp2 = ZstdCompressor(level=3)
-    comp3 = ZstdCompressor(level=1)
+    ZstdCompressor(level=1)
 
     assert 3 in ZstdCompressor._compressors_cache
     assert 1 in ZstdCompressor._compressors_cache

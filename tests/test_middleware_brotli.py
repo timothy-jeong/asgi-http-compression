@@ -6,7 +6,8 @@ from starlette.responses import JSONResponse, StreamingResponse
 from starlette.routing import Route
 
 try:
-    import brotli  # type: ignore[import-untyped]
+    import brotli  # type: ignore[import-untyped] # noqa: F401
+
     from asgi_http_compression import CompressionMiddleware
 
     BROTLI_AVAILABLE = True
