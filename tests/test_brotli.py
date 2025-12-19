@@ -2,13 +2,12 @@ import pytest
 
 try:
     import brotli  # type: ignore[import-untyped]
+
     from asgi_http_compression.compressors import BrotliCompressor
 
     BROTLI_AVAILABLE = True
 except ImportError:
     BROTLI_AVAILABLE = False
-
-from asgi_http_compression.responder import CompressionResponder
 
 from test_responder import (
     MockSend,
@@ -16,6 +15,8 @@ from test_responder import (
     mock_app,
     streaming_app,
 )
+
+from asgi_http_compression.responder import CompressionResponder
 
 
 @pytest.mark.skipif(not BROTLI_AVAILABLE, reason="brotli package not installed")
