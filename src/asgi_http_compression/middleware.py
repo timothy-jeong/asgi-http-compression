@@ -5,12 +5,12 @@ from collections.abc import Callable
 from typing import Any
 
 from asgi_http_compression.compressors import (
-    DeflateCompressor,
-    GzipCompressor,
-    BrotliCompressor,
-    ZstdCompressor,
     BROTLI_AVAILABLE,
     ZSTD_AVAILABLE,
+    BrotliCompressor,
+    DeflateCompressor,
+    GzipCompressor,
+    ZstdCompressor,
 )
 from asgi_http_compression.responder import CompressionResponder
 from asgi_http_compression.types import ASGIApp, Receive, Scope, Send

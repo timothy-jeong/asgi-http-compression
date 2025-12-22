@@ -40,6 +40,7 @@ brotli = ["brotli>=1.2.0"]
 zstd = ["zstandard>=0.25.0"]
 
 test = [
+    "tox-uv>=1.11.3",  
     "anyio>=4.11.0",
     "httpx>=0.28.1",
     "pytest>=9.0.1",
@@ -71,6 +72,9 @@ line-ending = "auto"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP"]
 
+ignore = ["E501"] 
+
+
 [tool.ruff.lint.isort]
 known-first-party = ["asgi_http_compression"]
 
@@ -84,3 +88,25 @@ pythonpath = ["src"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/asgi_http_compression"]
 
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310, py311, py312, py313, py314, lint
+requires = tox-uv>=1.11.3
+
+[testenv]
+extras =
+    test
+    brotli
+    zstd
+commands =
+    pytest {posargs}
+
+[testenv:lint]
+description = Run linting checks
+extras = lint
+commands =
+    ruff check .
+    ruff format --check .
+"""

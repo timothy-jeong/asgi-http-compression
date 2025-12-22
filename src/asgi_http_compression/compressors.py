@@ -11,7 +11,7 @@ try:
     import zstandard
 except ImportError:
     try:
-        from compression.zstd import ZstdCompressor, CompressionParameter
+        from compression.zstd import CompressionParameter, ZstdCompressor  # noqa: F401
     except ImportError:
         zstandard = None
 
